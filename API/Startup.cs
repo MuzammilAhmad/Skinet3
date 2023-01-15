@@ -1,3 +1,5 @@
+using System.Net.Mime;
+using System.Transactions;
 using System.Reflection.PortableExecutable;
 using System.Runtime.Serialization;
 using System.Net.Security;
@@ -16,6 +18,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Data;
 using Core.Interfaces;
+using AutoMapper;
+using API.Helpers;
 
 namespace API
 {
@@ -33,8 +37,9 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
 
-
+            services.AddScoped(typeof(IGenericRepository<>),(typeof(GenericRepository<>)));
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddAutoMapper(typeof(MappingProfiles));
             services.AddControllers();
             services.AddDbContext<StoreContext>(x =>
             x.UseSqlite(_config.GetConnectionString("DefaultConnection")));
@@ -51,7 +56,7 @@ namespace API
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseStaticFiles();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
